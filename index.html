@@ -24,18 +24,7 @@
         </div>
         <div class="split-container">
             <div class="half">
-                <textarea id="latex-input" placeholder="Enter LaTeX here...">$
-\textbf{Bold Text}$, $\textit{Italic Text}$, $\frac{a}{b}$ \n
-$\begin{enumerate}
-\item First point
-\item Second point
-\item Third point
-\end{enumerate}$
-
-$\begin{itemize}
-\item Bullet 1
-\item Bullet 2
-\end{itemize}$</textarea>
+                <textarea id="latex-input" placeholder="Enter LaTeX here..."></textarea>
             </div>
             <div class="half">
                 <div id="output" class="output"></div>
@@ -53,30 +42,28 @@ $\begin{itemize}
             let processedText = latexInput
                 .replace(/\\n/g, '<br>')
                 .replace(/\\\\/g, '<br>')  // Treat \ as new line
-                .replace(/\$\$([^$]+)\$\$/g, '<div>$$$1$$</div>')  // Block math
-                .replace(/\$([^$]+?)\$/g, '<span>$1</span>')  // Inline math (handle consecutive $)
-                .replace(/\textbf{([^}]+)}/g, '<strong>$1</strong>')  // Bold
-                .replace(/\textit{([^}]+)}/g, '<em>$1</em>')  // Italic
-                .replace(/\texttt{([^}]+)}/g, '<code>$1</code>')  // Monospaced
-                .replace(/\underline{([^}]+)}/g, '<u>$1</u>')  // Underline
-                .replace(/\begin{enumerate}/g, '<ol>')
-                .replace(/\end{enumerate}/g, '</ol>')
-                .replace(/\begin{itemize}/g, '<ul>')
-                .replace(/\end{itemize}/g, '</ul>')
-                .replace(/\item/g, '<li>')
-                .replace(/</li><li>/g, '</li><li>')  // Ensure proper list structure
-                .replace(/</ul><ul>/g, '')  // Prevent nested itemize duplication
-                .replace(/</ol><ol>/g, '')  // Prevent nested enumerate duplication
-                .replace(/\begin{matrix}/g, '\left[\begin{matrix}')  // Matrix with brackets
-                .replace(/\end{matrix}/g, '\end{matrix}\right]')
-                .replace(/\begin{tabular}{.*?}/g, '')  // Start of tabular, remove braces
-                .replace(/\end{tabular}/g, '')
-                .replace(/\hline/g, '<hr>')  // Horizontal line in tabular
-                .replace(/\multirow{\d+}{\*}{([^}]+)}/g, '$1')  // Handle multirow by retaining row content
-                .replace(/\multicolumn{\d+}{[^}]+}{([^}]+)}/g, '$1')  // Handle multicolumn by expanding content
-                .replace(/\cline{\d+-\d+}/g, '')  // Remove \cline entirely
+                .replace(/\$\\underline{([^}]+)}\$/g, '<u>$1</u>')  // Fix underline with $ wrapper
+                .replace(/\\underline{([^}]+)}/g, '<u>$1</u>')  // Underline without $ wrapper
+                .replace(/\\textbf{([^}]+)}/g, '<strong>$1</strong>')  // Bold
+                .replace(/\\textit{([^}]+)}/g, '<em>$1</em>')  // Italic
+                .replace(/\\texttt{([^}]+)}/g, '<code>$1</code>')  // Monospaced
+                .replace(/\\begin{enumerate}/g, '<ol>')
+                .replace(/\\end{enumerate}/g, '</ol>')
+                .replace(/\\begin{itemize}/g, '<ul>')
+                .replace(/\\end{itemize}/g, '</ul>')
+                .replace(/\\item/g, '<li>')
+                .replace(/<\/li><li>/g, '</li><li>')  // Ensure proper list structure
+                .replace(/<\/ul><ul>/g, '')  // Prevent nested itemize duplication
+                .replace(/<\/ol><ol>/g, '')  // Prevent nested enumerate duplication
+                .replace(/\\begin{matrix}/g, '\\left[\\begin{matrix}')  // Matrix with brackets
+                .replace(/\\end{matrix}/g, '\\end{matrix}\\right]')
+                .replace(/\\begin{tabular}{.*?}/g, '')  // Start of tabular, remove braces
+                .replace(/\\end{tabular}/g, '')
+                .replace(/\\hline/g, '<hr>')  // Horizontal line in tabular
+                .replace(/\\multirow{[^}]+}{[^}]+}{([^}]+)}/g, '$1')  // Handle multirow
+                .replace(/\\multicolumn{[^}]+}{[^}]+}{([^}]+)}/g, '$1')  // Handle multicolumn
                 .replace(/&/g, ' | ')  // Column separator
-                .replace(/\/g, '<br>');  // Row separator
+                .replace(/\\\\/g, '<br>');  // Row separator
 
             outputDiv.innerHTML = processedText;
             MathJax.typesetPromise([outputDiv]).catch((err) => console.log(err));
@@ -93,7 +80,7 @@ $\begin{itemize}
 
         window.onload = convertLatex;  // Auto convert on load
     </script>
-    
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
